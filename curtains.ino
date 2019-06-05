@@ -4,15 +4,19 @@ const char* password = "dyna_password";
 
 WiFiServer server(80);
 
-// NEW+
-int loglevel  = 1;
-const int ender = 14;
-const int motor_pin_1 = 16; //D0
-const int motor_pin_2 = 5;  //D1
-const int motor_pin_3 = 4;  //D2
-const int motor_pin_4 = 0;  //D3
+// btn_s
+const int ender_pin    = 14; //D5
+const int btn_up_pin   = 12; //D6
+const int btn_down_pin = 13; //D7
+// Motor
+const int motor_pin_1  = 16; //D0
+const int motor_pin_2  = 5;  //D1
+const int motor_pin_3  = 4;  //D2
+const int motor_pin_4  = 0;  //D3
+
 const int step_up   = 40000;
 const int step_down = 22000; 
+int loglevel        = 1;
 int steps_left;
 int last_step_time; 
 int last_step_time2;  
@@ -23,17 +27,14 @@ int directionmotor = 1;
 int step_delay     = 3;
 int step_delay2    = 10;
 int moveroll       = 1;
-int enderstate     = 1;  
-int buttonState    = 0;  
+int ender_state    = 1;
 int i;
-int buttonupstate   = 1;
-int buttonup        = 2;
-int buttondownstate = 1;
-int buttondown      = 4;
+int btn_up_state   = 1;
+int btn_down_state = 1;
 
 void moveupcommand() {
   moveroll = 1;
-  directionmotor = 1;
+  directionmotor  = 1;
 }
 
 void movedowncommand() {
@@ -102,12 +103,11 @@ void motor(int thisStep) {
   }
 }
 
-//NEW- 
 void go() {
   //Опрашиваем кнопки и датчики  
-  enderstate = digitalRead(ender);
-  buttonupstate = digitalRead(buttonup);
-  buttondownstate = digitalRead(buttondown);  
+  ender_state    = digitalRead(ender_pin);
+  btn_up_state   = digitalRead(btn_up_pin);
+  btn_down_state = digitalRead(btn_down_pin);  
 
 //Если количество шагов больше чем разрешено при движении вниз. И если направление - вниз.  
 if (global_down_step_number > step_down && directionmotor == 0)
@@ -118,21 +118,19 @@ if (global_down_step_number > step_down && directionmotor == 0)
 }
 
 //Если нажали кнопку "Вверх"
-if (buttonupstate == 0) {
+if (btn_up_state == 0) {
   Serial.println(WiFi.status());  
 }
 
 //Реакция на концевик + направление вверх.  
-    if (enderstate == 0 && directionmotor == 1)
-{
-  if (loglevel > 0)      
-  Serial.println("Roll stop by ender, moving up");
-  motorstop();  
-  global_down_step_number = 1;
-}  
+ if (ender_state == 0 && directionmotor == 1) {
+    if (loglevel > 0) Serial.println("Roll stop by ender, moving up");
+    motorstop();  
+    global_down_step_number = 1;
+ }  
   
 //Собственно движение, если  разрешено (moveroll = 1)
- if (moveroll==1){
+ if (moveroll == 1){
    if (millis() - last_step_time2 >= step_delay2)
       { 
         if (loglevel > 0)
@@ -146,12 +144,10 @@ if (buttonupstate == 0) {
              motor(step_number);
              step_number++;
              global_down_step_number--;
-                if (step_number > 7) {
-                   step_number = 0;
-                }
+             if (step_number > 7) step_number = 0;
            }
         //Если двигаемся вниз
-          if (directionmotor ==0 ) {
+          if (directionmotor == 0) {
              if (step_number == 0) step_number = 7;
              motor(step_number);
              step_number--;
@@ -164,46 +160,43 @@ if (buttonupstate == 0) {
 void setup() {
 //Присвоение времени с начала работы времени последнего шага.
 last_step_time = millis();
- //
- pinMode(ender,      INPUT_PULLUP);
- pinMode(buttonup,   INPUT_PULLUP);
- pinMode(buttondown, INPUT_PULLUP);
- 
- pinMode(motor_pin_1, OUTPUT);
- pinMode(motor_pin_2, OUTPUT);
- pinMode(motor_pin_3, OUTPUT);
- pinMode(motor_pin_4, OUTPUT);
- 
- digitalWrite(motor_pin_1, 0);
- digitalWrite(motor_pin_2, 0);
- digitalWrite(motor_pin_3, 0);
- digitalWrite(motor_pin_4, 0);
-//NEW-
-  
-  Serial.begin(57600);
-  delay(10);
 
-  // Connect to WiFi network
-  Serial.println();
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
-  
-  WiFi.begin(ssid, password);
-  
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("");
-  Serial.println("WiFi connected");
-  
-  // Start the server
-  server.begin();
-  Serial.println("Server started");
+pinMode(ender_pin,    INPUT_PULLUP);
+pinMode(btn_up_pin,   INPUT_PULLUP);
+pinMode(btn_down_pin, INPUT_PULLUP);
+ 
+pinMode(motor_pin_1,  OUTPUT);
+pinMode(motor_pin_2,  OUTPUT);
+pinMode(motor_pin_3,  OUTPUT);
+pinMode(motor_pin_4,  OUTPUT);
+ 
+digitalWrite(motor_pin_1, 0);
+digitalWrite(motor_pin_2, 0);
+digitalWrite(motor_pin_3, 0);
+digitalWrite(motor_pin_4, 0);
 
-  // Print the IP address
-  Serial.println(WiFi.localIP());
+Serial.begin(57600);
+
+// Connect to WiFi network
+Serial.println();
+Serial.println();
+Serial.print("Connecting to ");
+Serial.println(ssid);
+WiFi.begin(ssid, password);
+  
+while (WiFi.status() != WL_CONNECTED) {
+  delay(500);
+  Serial.print(".");
+}
+ Serial.println("");
+ Serial.println("WiFi connected");
+  
+ // Start the server
+ server.begin();
+ Serial.println("Server started");
+
+ // Print the IP address
+ Serial.println(WiFi.localIP());
 }
 
 void loop() {
