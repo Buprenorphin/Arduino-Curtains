@@ -121,10 +121,6 @@ if (global_down_step_number > step_down && directionmotor == 0)
 if (buttonupstate == 0) {
   Serial.println(WiFi.status());  
 }
-//Если шагов не осталось при движении вниз (меньше 0)
-//  if (global_down_step_number < 0 && directionmotor == 0)
-//motorstop();
-
 
 //Реакция на концевик + направление вверх.  
     if (enderstate == 0 && directionmotor == 1)
