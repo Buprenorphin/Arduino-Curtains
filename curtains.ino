@@ -104,12 +104,12 @@ void motor(int thisStep) {
 }
 
 void go() {
-  //Опрашиваем кнопки и датчики  
+  //Read values of buttons and enders
   ender_state    = digitalRead(ender_pin);
   btn_up_state   = digitalRead(btn_up_pin);
   btn_down_state = digitalRead(btn_down_pin);  
 
-//Если количество шагов больше чем разрешено при движении вниз. И если направление - вниз.  
+//If quantity of steps is more than allowed and direction = DOWN
 if (global_down_step_number > step_down && directionmotor == 0)
   {
     if (loglevel > 0)  
@@ -117,19 +117,19 @@ if (global_down_step_number > step_down && directionmotor == 0)
     motorstop();
 }
 
-//Если нажали кнопку "Вверх"
+//If button "UP" is pressed
 if (btn_up_state == 0) {
   Serial.println(WiFi.status());  
 }
 
-//Реакция на концевик + направление вверх.  
+//If ender state = 0 and direction = UP
  if (ender_state == 0 && directionmotor == 1) {
     if (loglevel > 0) Serial.println("Roll stop by ender, moving up");
     motorstop();  
     global_down_step_number = 1;
  }  
   
-//Собственно движение, если  разрешено (moveroll = 1)
+//Moving (moveroll = 1)
  if (moveroll == 1){
    if (millis() - last_step_time2 >= step_delay2)
       { 
@@ -139,14 +139,14 @@ if (btn_up_state == 0) {
    if (millis() - last_step_time >= step_delay) 
       {
         last_step_time = millis();
-        //Если двигаемся вверх
+        //If miving UP
           if (directionmotor==1){
              motor(step_number);
              step_number++;
              global_down_step_number--;
              if (step_number > 7) step_number = 0;
            }
-        //Если двигаемся вниз
+        //If moving down
           if (directionmotor == 0) {
              if (step_number == 0) step_number = 7;
              motor(step_number);
@@ -158,7 +158,7 @@ if (btn_up_state == 0) {
 }
 
 void setup() {
-//Присвоение времени с начала работы времени последнего шага.
+
 last_step_time = millis();
 
 pinMode(ender_pin,    INPUT_PULLUP);
@@ -247,14 +247,11 @@ void loop() {
  
  
   else {
-    Serial.println("invalid request");
+    Serial.println("Invalid request");
     client.stop();
     return;
   }
 
-  // Set GPIO2 according to the request
-  //digitalWrite(16, val);
-  
   client.flush();
 
   // Prepare the response
@@ -277,6 +274,5 @@ void loop() {
   delay(1);
   Serial.println("Client disonnected");
 
-  // The client will actually be disconnected 
-  // when the function returns and 'client' object is detroyed
+  // The client will be disconnected when the function returns and 'client' object is detroyed
 }
