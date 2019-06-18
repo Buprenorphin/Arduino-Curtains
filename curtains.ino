@@ -15,7 +15,7 @@ const int motor_pin_3  = 4;  //D2
 const int motor_pin_4  = 0;  //D3
 
 const int step_up   = 40000;
-const int step_down = 22000; 
+const int step_down = 25500; 
 int loglevel        = 1;
 int steps_left;
 int last_step_time; 
@@ -261,14 +261,15 @@ void loop() {
 
   String s = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n";
   s += "<!DOCTYPE HTML>\r\n<html>\r\n";
-  s += "GPIO is now ";
-  s += (val)?"high ":"low ";
-  s += global_down_step_number;
-  s += moveroll;
-  s += "\n <hr>";
-  s += "\n <a href='/up'>Up</a> ";
-  s += "\n <a href='/down'>Down</a> ";
-  s += "\n <a href='/stop'>Stop</a> ";
+  //s += "GPIO is now ";
+  //s += (val)?"high ":"low ";
+  //s += global_down_step_number;
+  //s += moveroll;
+  s += "<style>h2 {text-align:center;} a {border:1px solid #0000ff; border-radius:15px; text-decoration:none; background:#0000ff; color:#ffffff; font-weight:bold; padding:10px 0; margin:25px 0px; display:block; width:100%; text-align:center; font-size:3vw;} </style>";
+  s += "\n <h2>CURTAINS REMOTE CONTROL</h3>";
+  s += "\n <a href='/up'>UP</a> ";
+  s += "\n <a href='/down'>DOWN</a> ";
+  s += "\n <a href='/stop'>STOP</a> ";
   s += "</html>\n";
   
   // Send the response to the client
